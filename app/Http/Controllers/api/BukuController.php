@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers\api;
 
-use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
 use App\Models\Buku;
+use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Validator;
+
 class BukuController extends Controller
 {
     /**
@@ -26,6 +28,21 @@ class BukuController extends Controller
     public function store(Request $request)
     {
       $dataBuku=new Buku;
+
+        $rules=[
+            'tajuk'=>'required',
+            'tarikh_dikeluarkan'=>'required|date',
+        ];
+
+        $validator=Validator::make($request->all(),$rules);
+        if($validator->fails()){
+            return response()->json([
+                'status'=>false,
+                'message'=>'Gagal Masuk',
+                'data'=>$validator->errors()
+          ]);
+        }
+
       $dataBuku->tajuk=$request->tajuk;
       $dataBuku->penulis=$request->penulis;
       $dataBuku->tarikh_dikeluarkan=$request->tarikh_dikeluarkan;
@@ -66,7 +83,31 @@ class BukuController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+        $dataBuku= Buku::find($id);
+
+        $rules=[
+            'tajuk'=>'required',
+            'tarikh_dikeluarkan'=>'required|date',
+        ];
+
+        $validator=Validator::make($request->all(),$rules);
+        if($validator->fails()){
+            return response()->json([
+                'status'=>false,
+                'message'=>'Gagal  Masukkan data',
+                'data'=>$validator->errors()
+          ]);
+        }
+
+      $dataBuku->tajuk=$request->tajuk;
+      $dataBuku->penulis=$request->penulis;
+      $dataBuku->tarikh_dikeluarkan=$request->tarikh_dikeluarkan;
+      $post=$dataBuku->save();
+
+      return response()->json([
+            'status'=>true,
+            'message'=>'Berjaya kemaskini data'
+      ]);
     }
 
     /**
